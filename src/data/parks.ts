@@ -1,0 +1,253 @@
+import type { Park, ParkDog } from "@/types";
+import { getDogById } from "./dogs";
+
+function pd(
+  dogId: string,
+  isFriend: boolean,
+  arrivedMinutesAgo: number
+): ParkDog | null {
+  const dog = getDogById(dogId);
+  return dog ? { dog, isFriend, arrivedMinutesAgo } : null;
+}
+
+function buildActiveDogs(
+  specs: Array<[string, boolean, number]>
+): ParkDog[] {
+  return specs
+    .map(([id, isFriend, mins]) => pd(id, isFriend, mins))
+    .filter((x): x is ParkDog => x !== null);
+}
+
+export const PARKS: Park[] = [
+  {
+    id: "new-farm",
+    name: "New Farm Park",
+    suburb: "New Farm",
+    latitude: -27.4692,
+    longitude: 153.0512,
+    isFenced: false,
+    hasSmallDogArea: true,
+    hasAgility: false,
+    hasWaterAccess: true,
+    distanceKm: 2.1,
+    activeDogCount: 12,
+    friendCount: 1,
+    activeDogs: buildActiveDogs([
+      ["bella", true, 8],
+      ["scout", false, 5],
+      ["rosie", false, 22],
+      ["milo", false, 15],
+      ["hugo", false, 40],
+      ["coco", false, 12],
+      ["archie", false, 55],
+      ["pepper", false, 3],
+      ["frankie", false, 28],
+      ["willow", false, 18],
+      ["ziggy", false, 7],
+      ["rex", false, 35],
+    ]),
+  },
+  {
+    id: "newstead",
+    name: "Newstead Park",
+    suburb: "Newstead",
+    latitude: -27.4534,
+    longitude: 153.0441,
+    isFenced: true,
+    hasSmallDogArea: true,
+    hasAgility: true,
+    hasWaterAccess: true,
+    distanceKm: 1.4,
+    activeDogCount: 7,
+    friendCount: 2,
+    activeDogs: buildActiveDogs([
+      ["bella", true, 2],
+      ["luna", true, 5],
+      ["rex", false, 12],
+      ["milo", false, 3],
+      ["ziggy", false, 25],
+      ["coco", false, 8],
+      ["archie", false, 40],
+    ]),
+  },
+  {
+    id: "teralba",
+    name: "Teralba Park",
+    suburb: "Everton Park",
+    latitude: -27.4076,
+    longitude: 152.9924,
+    isFenced: false,
+    hasSmallDogArea: false,
+    hasAgility: false,
+    hasWaterAccess: false,
+    distanceKm: 8.2,
+    activeDogCount: 5,
+    friendCount: 0,
+    activeDogs: buildActiveDogs([
+      ["scout", false, 10],
+      ["daisy", false, 22],
+      ["hugo", false, 5],
+      ["pepper", false, 18],
+      ["willow", false, 30],
+    ]),
+  },
+  {
+    id: "sunset",
+    name: "Sunset Park",
+    suburb: "Kenmore",
+    latitude: -27.5124,
+    longitude: 152.9382,
+    isFenced: true,
+    hasSmallDogArea: true,
+    hasAgility: false,
+    hasWaterAccess: true,
+    distanceKm: 9.5,
+    activeDogCount: 9,
+    friendCount: 0,
+    activeDogs: buildActiveDogs([
+      ["archie", false, 8],
+      ["pepper", false, 4],
+      ["rosie", false, 15],
+      ["milo", false, 28],
+      ["frankie", false, 12],
+      ["ziggy", false, 35],
+      ["coco", false, 7],
+      ["rex", false, 20],
+      ["willow", false, 45],
+    ]),
+  },
+  {
+    id: "colmslie",
+    name: "Colmslie Reserve",
+    suburb: "Morningside",
+    latitude: -27.4582,
+    longitude: 153.0894,
+    isFenced: true,
+    hasSmallDogArea: true,
+    hasAgility: true,
+    hasWaterAccess: true,
+    distanceKm: 4.8,
+    activeDogCount: 4,
+    friendCount: 1,
+    activeDogs: buildActiveDogs([
+      ["charlie", true, 6],
+      ["ziggy", false, 14],
+      ["hugo", false, 32],
+      ["daisy", false, 8],
+    ]),
+  },
+  {
+    id: "riverside",
+    name: "Riverside Dog Park",
+    suburb: "Indooroopilly",
+    latitude: -27.5022,
+    longitude: 152.9742,
+    isFenced: true,
+    hasSmallDogArea: false,
+    hasAgility: false,
+    hasWaterAccess: true,
+    distanceKm: 6.1,
+    activeDogCount: 3,
+    friendCount: 0,
+    activeDogs: buildActiveDogs([
+      ["archie", false, 12],
+      ["pepper", false, 25],
+      ["willow", false, 5],
+    ]),
+  },
+  {
+    id: "kalinga",
+    name: "Kalinga Park",
+    suburb: "Clayfield",
+    latitude: -27.4182,
+    longitude: 153.0612,
+    isFenced: false,
+    hasSmallDogArea: true,
+    hasAgility: false,
+    hasWaterAccess: true,
+    distanceKm: 5.3,
+    activeDogCount: 6,
+    friendCount: 0,
+    activeDogs: buildActiveDogs([
+      ["rex", false, 8],
+      ["scout", false, 18],
+      ["luna", false, 42],
+      ["milo", false, 3],
+      ["coco", false, 25],
+      ["frankie", false, 15],
+    ]),
+  },
+  {
+    id: "crosby",
+    name: "Crosby Park",
+    suburb: "Albion",
+    latitude: -27.4312,
+    longitude: 153.0482,
+    isFenced: true,
+    hasSmallDogArea: true,
+    hasAgility: true,
+    hasWaterAccess: false,
+    distanceKm: 3.2,
+    activeDogCount: 8,
+    friendCount: 0,
+    activeDogs: buildActiveDogs([
+      ["bella", false, 20],
+      ["hugo", false, 10],
+      ["daisy", false, 35],
+      ["ziggy", false, 5],
+      ["rosie", false, 28],
+      ["archie", false, 12],
+      ["pepper", false, 45],
+      ["willow", false, 8],
+    ]),
+  },
+  {
+    id: "victoria",
+    name: "Victoria Park",
+    suburb: "Herston",
+    latitude: -27.4482,
+    longitude: 153.0282,
+    isFenced: false,
+    hasSmallDogArea: false,
+    hasAgility: false,
+    hasWaterAccess: false,
+    distanceKm: 2.8,
+    activeDogCount: 2,
+    friendCount: 0,
+    activeDogs: buildActiveDogs([
+      ["milo", false, 15],
+      ["frankie", false, 8],
+    ]),
+  },
+  {
+    id: "elanora",
+    name: "Elanora Park",
+    suburb: "Wynnum West",
+    latitude: -27.4522,
+    longitude: 153.1624,
+    isFenced: true,
+    hasSmallDogArea: true,
+    hasAgility: false,
+    hasWaterAccess: true,
+    distanceKm: 12.4,
+    activeDogCount: 5,
+    friendCount: 0,
+    activeDogs: buildActiveDogs([
+      ["scout", false, 22],
+      ["rex", false, 10],
+      ["charlie", false, 35],
+      ["luna", false, 5],
+      ["daisy", false, 18],
+    ]),
+  },
+];
+
+const parksById = new Map(PARKS.map((p) => [p.id, p]));
+
+export function getParkById(id: string): Park | undefined {
+  return parksById.get(id);
+}
+
+export function getParkByName(name: string): Park | undefined {
+  return PARKS.find((p) => p.name === name);
+}

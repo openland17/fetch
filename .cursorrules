@@ -1,0 +1,68 @@
+You are building "Fetch" — a proximity-based dog social network. This is a web-based MVP demo with ALL MOCK DATA. No backend, no APIs, no database. Everything runs client-side with hardcoded mock data and React state.
+
+TECH STACK:
+- Next.js 14 (App Router)
+- TypeScript (strict)
+- Tailwind CSS
+- Framer Motion for animations
+- Lucide React for icons
+- next-pwa (optional, for mobile feel)
+- Deploy target: Vercel
+
+THIS IS A MOBILE-FIRST WEB APP:
+- Max width: 430px, centered on desktop with a phone-frame wrapper
+- All interactions are tap-based (no hover-dependent UI)
+- Bottom tab navigation (fixed)
+- Native app feel: full-bleed screens, no browser chrome feeling
+- iOS-style transitions (slide from right for push, fade for tabs)
+- Smooth 60fps animations everywhere
+
+DESIGN SYSTEM:
+- Colors:
+  - Navy: #0D2137 (primary backgrounds, headers)
+  - Blue: #1A7BBF (CTAs, interactive elements, links)
+  - Orange: #E8913A (friend highlights, notifications, warmth)
+  - Off-white: #F5F7FA (page backgrounds)
+  - White: #FFFFFF (cards)
+  - Charcoal: #1C2833 (primary text)
+  - Grey: #7F8C8D (secondary text)
+  - Light Blue: #E8F0F7 (subtle backgrounds, badges)
+  - Light Orange: #FEF5E7 (friend card backgrounds)
+  - Success Green: #27AE60 (confirmations)
+  - Error Red: #E74C3C (destructive actions)
+
+- Typography:
+  - Font: system-ui, -apple-system, sans-serif (native feel)
+  - Titles: 24-32px, font-weight 800
+  - Headings: 18-20px, font-weight 700
+  - Body: 14-15px, font-weight 400
+  - Captions: 11-12px, font-weight 400, grey color
+  - All caps for section labels, letter-spacing 0.05em, 11px, grey
+
+- Spacing: Tailwind defaults (p-4 = 16px standard padding)
+- Border radius: rounded-xl (12px) for cards, rounded-2xl (16px) for modals, rounded-full for avatars/pills
+- Shadows: shadow-sm for cards, shadow-lg for modals/floating elements
+- Cards: white background, rounded-xl, shadow-sm, p-4
+
+MOCK DATA APPROACH:
+- All mock data lives in src/data/ folder
+- React state (useState/useReducer) for interactive state changes
+- localStorage for persistence between page refreshes (check-in state, friends added, etc.)
+- No API calls, no fetch(), no external data sources
+
+FILE STRUCTURE:
+- src/app/ — Next.js App Router pages
+- src/components/ — Reusable UI components
+- src/components/screens/ — Full screen components (one per "page")
+- src/data/ — All mock data files
+- src/hooks/ — Custom React hooks
+- src/types/ — TypeScript interfaces
+- src/lib/ — Utilities
+
+CRITICAL UX RULES:
+- Every tap should feel responsive (instant visual feedback)
+- Use Framer Motion for all transitions and micro-interactions
+- Loading states should use skeleton screens, not spinners
+- Empty states should be friendly and actionable
+- The app should feel REAL — like you're using a production app, not a prototype
+- Dog emoji (🐕) is the app's visual signature — use sparingly but consistently

@@ -1,0 +1,52 @@
+import type { Notification } from "@/types";
+
+export const NOTIFICATIONS_INITIAL: Notification[] = [
+  {
+    id: "n1",
+    type: "friend_alert",
+    title: "Bella is at Newstead Park! 🐕",
+    body: "Your friend Bella is at the park right now.",
+    timestamp: new Date(Date.now() - 2 * 60 * 1000).toISOString(),
+    parkId: "newstead",
+    dogName: "Bella",
+    read: false,
+  },
+  {
+    id: "n2",
+    type: "visit_summary",
+    title: "Visit Complete — Colmslie Reserve",
+    body: "Cooper spent 35 minutes at Colmslie Reserve. Met Charlie and Ziggy.",
+    timestamp: new Date(Date.now() - 86400000).toISOString(),
+    parkId: "colmslie",
+    read: true,
+  },
+  {
+    id: "n3",
+    type: "friendship_suggestion",
+    title: "Cooper spent 18 min with Rex. Add as friend?",
+    body: "They've met 3 times at Newstead Park.",
+    timestamp: new Date().toISOString(),
+    dogName: "Rex",
+    parkId: "newstead",
+    read: false,
+  },
+  {
+    id: "n4",
+    type: "friend_alert",
+    title: "Luna is at New Farm Park! 🐕",
+    body: "Your friend Luna was at the park.",
+    timestamp: new Date(Date.now() - 3 * 86400000).toISOString(),
+    parkId: "new-farm",
+    dogName: "Luna",
+    read: true,
+  },
+  {
+    id: "n5",
+    type: "visit_summary",
+    title: "Visit Complete — New Farm Park",
+    body: "Cooper spent 55 minutes at New Farm Park. Met Bella, Scout and Rosie.",
+    timestamp: new Date(Date.now() - 3 * 86400000).toISOString(),
+    parkId: "new-farm",
+    read: true,
+  },
+];

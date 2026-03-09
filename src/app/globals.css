@@ -1,0 +1,75 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer utilities {
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* iOS: momentum scrolling inside scroll containers */
+  .scroll-touch {
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+/* Prevent horizontal scroll, ensure touch targets */
+html, body {
+  overflow-x: hidden;
+}
+@media (max-width: 430px) {
+  body {
+    min-width: 100vw;
+  }
+}
+
+/* iOS Safari: no rubber-band bounce on body (scroll containers keep normal scroll) */
+.ios-safari-body {
+  overscroll-behavior-y: none;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* 100vh bug: use 100dvh with fallback for older iOS */
+.min-h-safe-screen {
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+.h-safe-screen {
+  height: 100vh;
+  height: 100dvh;
+}
+
+/* iOS: remove 300ms tap delay on interactive elements */
+button,
+a,
+[role="button"],
+input,
+select,
+textarea,
+label[for] {
+  touch-action: manipulation;
+}
+
+/* Prevent Safari zoom on focus when font-size < 16px */
+input,
+select,
+textarea {
+  font-size: 16px;
+}
+
+/* Scroll padding: at least 100px so last card isn't hidden behind nav */
+:root {
+  --nav-height: 5.5rem;
+  --scroll-padding-bottom: max(100px, calc(var(--nav-height) + env(safe-area-inset-bottom) + 1rem));
+}
+
+@layer components {
+  .section-label {
+    @apply text-xs uppercase tracking-wider text-grey font-semibold mb-3;
+    letter-spacing: 0.05em;
+  }
+}
