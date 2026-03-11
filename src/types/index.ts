@@ -14,6 +14,11 @@ export interface ParkDog {
   arrivedMinutesAgo: number;
 }
 
+export interface ParkActivity {
+  text: string;
+  minutesAgo: number;
+}
+
 export interface Park {
   id: string;
   name: string;
@@ -28,6 +33,7 @@ export interface Park {
   activeDogCount: number;
   friendCount: number;
   activeDogs: ParkDog[];
+  recentActivity?: ParkActivity[];
 }
 
 export interface Friendship {
@@ -56,6 +62,7 @@ export interface VisitDog {
 
 export interface Visit {
   id: string;
+  parkId: string;
   parkName: string;
   date: string;
   durationMinutes: number;
@@ -68,7 +75,8 @@ export interface Visit {
 export type NotificationType =
   | "friend_alert"
   | "visit_summary"
-  | "friendship_suggestion";
+  | "friendship_suggestion"
+  | "friendship_confirmed";
 
 export interface Notification {
   id: string;

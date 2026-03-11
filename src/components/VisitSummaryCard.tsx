@@ -9,6 +9,7 @@ import Badge from "@/components/ui/Badge";
 import Button from "@/components/ui/Button";
 import { formatVisitDate, formatDuration } from "@/lib/dateHelpers";
 import { useApp } from "@/hooks/useAppState";
+import { useDogProfile } from "./DogProfileSheet";
 
 interface VisitSummaryCardProps {
   visit: Visit;
@@ -17,6 +18,7 @@ interface VisitSummaryCardProps {
 export default function VisitSummaryCard({ visit }: VisitSummaryCardProps) {
   const [expanded, setExpanded] = useState(false);
   const { state, addFriendFromSuggestion } = useApp();
+  const { openDogProfile } = useDogProfile();
 
   const friendIds = new Set(state.friendships.map((f) => f.dog.id));
   const suggestionByDogId = new Map(
@@ -31,6 +33,7 @@ export default function VisitSummaryCard({ visit }: VisitSummaryCardProps) {
     <motion.div
       className="bg-white rounded-xl shadow-sm overflow-hidden"
       layout
+      whileTap={{ scale: 0.98 }}
     >
       <button
         type="button"
@@ -77,12 +80,14 @@ export default function VisitSummaryCard({ visit }: VisitSummaryCardProps) {
                       key={vd.dog.id}
                       className="flex items-center gap-3 py-2"
                     >
-                      <Avatar
-                        src={vd.dog.photoUrl}
-                        alt={vd.dog.name}
-                        size="sm"
-                        bordered={isFriend}
-                      />
+                      <button type="button" onClick={() => openDogProfile(vd.dog.id)}>
+                        <Avatar
+                          src={vd.dog.photoUrl}
+                          alt={vd.dog.name}
+                          size="sm"
+                          bordered={isFriend}
+                        />
+                      </button>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 flex-wrap">
                           <span className="font-semibold text-sm text-charcoal">

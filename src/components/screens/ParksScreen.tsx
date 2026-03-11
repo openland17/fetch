@@ -2,14 +2,16 @@
 
 import { useRef, useState, useCallback, useMemo, useEffect } from "react";
 import { usePathname } from "next/navigation";
-import { Bell } from "lucide-react";
+import { Bell, Search, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { PARKS } from "@/data/parks";
 import { useApp } from "@/hooks/useAppState";
 import { useScrollRestore } from "@/hooks/useScrollRestore";
 import ParkCard from "@/components/ParkCard";
+import ParkMap from "@/components/ParkMap";
 import NotificationBanner from "@/components/NotificationBanner";
 import NotificationDropdown from "@/components/NotificationDropdown";
+import Toast from "@/components/ui/Toast";
 
 const BANNER_SESSION_KEY = "fetch-notification-banner-shown";
 const BANNER_DELAY_MS = 3000;
@@ -55,12 +57,25 @@ const sortedParks = [...PARKS].sort((a, b) => a.distanceKm - b.distanceKm);
 
 export default function ParksScreen() {
   const pathname = usePathname();
-  const { state, markNotificationRead, markAllNotificationsRead } = useApp();
+  const { state, markNotificationRead, markAllNotificationsRead, dismissNotification } = useApp();
   const listRef = useRef<HTMLDivElement>(null);
   const parkRefs = useRef<(HTMLDivElement | null)[]>([]);
   const [refreshing, setRefreshing] = useState(false);
   const [showBanner, setShowBanner] = useState(false);
   const [notificationOpen, setNotificationOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [activeFilters, setActiveFilters] = useState<Set<string>>(new Set());
+  const [welcomeToast, setWelcomeToast] = useState(false);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const WELCOME_KEY = "fetch-welcome-shown";
+    if (localStorage.getItem(WELCOME_KEY) === "1") return;
+    localStorage.setItem(WELCOME_KEY, "1");
+    const t = setTimeout(() => setWelcomeToast(true), 500);
+    const t2 = setTimeout(() => setWelcomeToast(false), 3000);
+    return () => { clearTimeout(t); clearTimeout(t2); };
+  }, []);
 
   useScrollRestore(pathname, listRef);
 
@@ -119,6 +134,26 @@ export default function ParksScreen() {
     return active ? active.parkName : null;
   }, [state.isCheckedIn, state.visits]);
 
+  const toggleFilter = useCallback((f: string) => {
+    setActiveFilters((prev) => {
+      const next = new Set(prev);
+      if (next.has(f)) next.delete(f);
+      else next.add(f);
+      return next;
+    });
+  }, []);
+
+  const filteredParks = useMemo(() => {
+    let result = sortedParks;
+    const q = searchQuery.trim().toLowerCase();
+    if (q) result = result.filter((p) => p.name.toLowerCase().includes(q) || p.suburb.toLowerCase().includes(q));
+    if (activeFilters.has("friends")) result = result.filter((p) => (parkFriendCounts.get(p.id) ?? 0) > 0);
+    if (activeFilters.has("fenced")) result = result.filter((p) => p.isFenced);
+    if (activeFilters.has("water")) result = result.filter((p) => p.hasWaterAccess);
+    if (activeFilters.has("near")) result = result.filter((p) => p.distanceKm < 5);
+    return result;
+  }, [searchQuery, activeFilters, parkFriendCounts]);
+
   const scrollToPark = useCallback((parkId: string) => {
     const idx = sortedParks.findIndex((p) => p.id === parkId);
     if (idx >= 0 && parkRefs.current[idx]) {
@@ -129,19 +164,12 @@ export default function ParksScreen() {
     }
   }, []);
 
-  const mapParks = sortedParks.slice(0, 4);
-  const markerPositions = [
-    { left: "18%", top: "35%" },
-    { left: "55%", top: "25%" },
-    { left: "75%", top: "55%" },
-    { left: "30%", top: "70%" },
-  ];
-
   return (
     <div className="flex flex-col min-h-full">
+      <Toast message="Welcome, Cooper! 🐕" variant="success" visible={welcomeToast} />
       {/* Top section — fixed height, non-scrollable */}
       <div
-        className="bg-navy shrink-0 pt-[env(safe-area-inset-top)]"
+        className="bg-gradient-to-b from-navy to-[#0F2A45] shrink-0 pt-[env(safe-area-inset-top)]"
         style={{
           paddingTop: `calc(0.5rem + env(safe-area-inset-top))`,
           minHeight: HEADER_HEIGHT,
@@ -149,7 +177,13 @@ export default function ParksScreen() {
       >
         <div className="px-4 flex items-start justify-between relative">
           <div>
-            <h1 className="text-white font-extrabold text-[24px] tracking-wide leading-tight">
+            <h1 className="text-white font-extrabold text-[24px] tracking-wide leading-tight flex items-center gap-2">
+              <svg viewBox="0 0 24 24" className="w-6 h-6" fill="none">
+                <path d="M12 2C10 2 8.5 4 8.5 6C8.5 8 10 9 12 9C14 9 15.5 8 15.5 6C15.5 4 14 2 12 2Z" fill="currentColor" opacity="0.9"/>
+                <path d="M5 5C3.5 5 2 6.5 2 8C2 9.5 3 10.5 5 10.5C7 10.5 8 9.5 8 8C8 6.5 6.5 5 5 5Z" fill="currentColor" opacity="0.7"/>
+                <path d="M19 5C17.5 5 16 6.5 16 8C16 9.5 17 10.5 19 10.5C21 10.5 22 9.5 22 8C22 6.5 20.5 5 19 5Z" fill="currentColor" opacity="0.7"/>
+                <path d="M12 10C9 10 5 13 5 16C5 19 8 22 12 22C16 22 19 19 19 16C19 13 15 10 12 10Z" fill="currentColor"/>
+              </svg>
               FETCH
             </h1>
             <p className="text-grey text-xs mt-0.5">
@@ -163,7 +197,12 @@ export default function ParksScreen() {
             whileTap={{ scale: 0.95 }}
             aria-label="Notifications"
           >
-            <Bell size={24} className="text-white" strokeWidth={2} />
+            <motion.span
+              animate={unreadCount > 0 ? { rotate: [0, 12, -12, 8, -8, 0] } : { rotate: 0 }}
+              transition={unreadCount > 0 ? { duration: 0.6, repeat: Infinity, repeatDelay: 4 } : {}}
+            >
+              <Bell size={24} className="text-white" strokeWidth={2} />
+            </motion.span>
             {unreadCount > 0 && (
               <motion.span
                 className="absolute top-1 right-1 w-2.5 h-2.5 rounded-full bg-orange"
@@ -180,6 +219,7 @@ export default function ParksScreen() {
             notifications={state.notifications}
             onMarkAllRead={markAllNotificationsRead}
             onNotificationTap={(n) => markNotificationRead(n.id)}
+            onDismiss={dismissNotification}
           />
         </div>
 
@@ -202,31 +242,55 @@ export default function ParksScreen() {
           )}
         </div>
 
-        {/* Map placeholder */}
-        <div
-          className="mx-4 rounded-xl overflow-hidden relative"
-          style={{
-            height: MAP_HEIGHT,
-            background: "linear-gradient(135deg, #E8F0F7 0%, #d4edda 100%)",
-          }}
-        >
-          {mapParks.map((park, i) => (
-            <motion.button
-              key={park.id}
+        {/* Map */}
+        <ParkMap
+          parks={sortedParks}
+          friendCounts={parkFriendCounts}
+          onMarkerTap={scrollToPark}
+          height={MAP_HEIGHT}
+        />
+      </div>
+
+      {/* Search & Filters */}
+      <div className="px-4 py-2 bg-offwhite shrink-0">
+        <div className="relative">
+          <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-grey" strokeWidth={2} />
+          <input
+            type="text"
+            placeholder="Search parks..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full pl-9 pr-8 py-2.5 text-sm rounded-xl bg-white border border-grey/20 text-charcoal placeholder:text-grey/60 focus:outline-none focus:ring-2 focus:ring-blue/30"
+          />
+          {searchQuery && (
+            <button
               type="button"
-              className="absolute w-10 h-10 rounded-full flex items-center justify-center text-white text-xs font-bold shadow-md border-2 border-white"
-              style={{
-                left: markerPositions[i]?.left ?? "50%",
-                top: markerPositions[i]?.top ?? "50%",
-                transform: "translate(-50%, -50%)",
-                backgroundColor:
-                  (parkFriendCounts.get(park.id) ?? 0) > 0 ? "#E8913A" : "#1A7BBF",
-              }}
-              whileTap={{ scale: 0.9 }}
-              onClick={() => scrollToPark(park.id)}
+              className="absolute right-2 top-1/2 -translate-y-1/2 p-1"
+              onClick={() => setSearchQuery("")}
             >
-              {park.activeDogCount}
-            </motion.button>
+              <X size={14} className="text-grey" />
+            </button>
+          )}
+        </div>
+        <div className="flex gap-2 mt-2 overflow-x-auto scrollbar-hide">
+          {([
+            { key: "friends", label: "Friends here" },
+            { key: "fenced", label: "Fenced" },
+            { key: "water", label: "Water" },
+            { key: "near", label: "< 5km" },
+          ] as const).map((f) => (
+            <button
+              key={f.key}
+              type="button"
+              onClick={() => toggleFilter(f.key)}
+              className={`shrink-0 rounded-full text-xs font-medium px-3 py-1.5 transition-colors ${
+                activeFilters.has(f.key)
+                  ? "bg-blue text-white"
+                  : "bg-white text-charcoal border border-grey/20"
+              }`}
+            >
+              {f.label}
+            </button>
           ))}
         </div>
       </div>
@@ -292,19 +356,27 @@ export default function ParksScreen() {
           <p className="section-label">
             NEARBY PARKS
           </p>
-          <div className="space-y-3">
-            {sortedParks.map((park, index) => (
-              <ParkCard
-                key={park.id}
-                ref={(el) => {
-                  parkRefs.current[index] = el;
-                }}
-                park={park}
-                index={index}
-                friendCountOverride={parkFriendCounts.get(park.id)}
-              />
-            ))}
-          </div>
+          {filteredParks.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-12 text-center">
+              <span className="text-4xl mb-3">🔍</span>
+              <p className="text-charcoal font-medium">No parks match your filters</p>
+              <p className="text-grey text-sm mt-1">Try adjusting your search or filters</p>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {filteredParks.map((park, index) => (
+                <ParkCard
+                  key={park.id}
+                  ref={(el) => {
+                    parkRefs.current[index] = el;
+                  }}
+                  park={park}
+                  index={index}
+                  friendCountOverride={parkFriendCounts.get(park.id)}
+                />
+              ))}
+            </div>
+          )}
         </div>
         </div>
       </div>

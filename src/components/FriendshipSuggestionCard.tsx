@@ -7,6 +7,7 @@ import Button from "@/components/ui/Button";
 import { motion } from "framer-motion";
 import { Check } from "lucide-react";
 import { twMerge } from "tailwind-merge";
+import { useDogProfile } from "./DogProfileSheet";
 
 interface FriendshipSuggestionCardProps {
   suggestion: FriendshipSuggestion;
@@ -15,12 +16,15 @@ interface FriendshipSuggestionCardProps {
   priority?: boolean;
 }
 
-const CONFETTI_COUNT = 4;
 const confettiPositions = [
-  { left: "20%", top: "30%" },
-  { left: "70%", top: "25%" },
-  { left: "40%", top: "60%" },
-  { left: "80%", top: "55%" },
+  { left: "15%", top: "20%", color: "bg-orange" },
+  { left: "65%", top: "15%", color: "bg-blue" },
+  { left: "35%", top: "55%", color: "bg-orange" },
+  { left: "80%", top: "50%", color: "bg-blue" },
+  { left: "10%", top: "70%", color: "bg-orange" },
+  { left: "50%", top: "30%", color: "bg-blue" },
+  { left: "90%", top: "65%", color: "bg-orange" },
+  { left: "25%", top: "85%", color: "bg-blue" },
 ];
 
 export default function FriendshipSuggestionCard({
@@ -29,6 +33,7 @@ export default function FriendshipSuggestionCard({
   onDismiss,
   priority = false,
 }: FriendshipSuggestionCardProps) {
+  const { openDogProfile } = useDogProfile();
   const [status, setStatus] = useState<"idle" | "added">("idle");
 
   const handleAdd = useCallback(() => {
@@ -51,6 +56,7 @@ export default function FriendshipSuggestionCard({
       initial={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: -80 }}
       transition={{ duration: 0.3 }}
+      whileTap={{ scale: 0.98 }}
           className={twMerge(
             "rounded-xl shadow-sm p-4 border-l-4 border-l-blue bg-lightblue overflow-hidden relative",
             status === "added" && "border-l-orange bg-lightorange"
@@ -66,13 +72,14 @@ export default function FriendshipSuggestionCard({
               {confettiPositions.map((pos, i) => (
                 <motion.span
                   key={i}
-                  className="absolute w-3 h-3 rounded-full bg-orange"
+                  className={`absolute rounded-full ${pos.color} ${i % 2 === 0 ? "w-3 h-3" : "w-2 h-2"}`}
                   style={{ left: pos.left, top: pos.top }}
                   initial={{ scale: 0, opacity: 1 }}
-                  animate={{ scale: 2.5, opacity: 0 }}
+                  animate={{ scale: 3, opacity: 0, y: -10 }}
                   transition={{
-                    duration: 0.6,
-                    delay: i * 0.08,
+                    duration: 0.7,
+                    delay: i * 0.06,
+                    ease: "easeOut",
                   }}
                 />
               ))}
@@ -80,12 +87,14 @@ export default function FriendshipSuggestionCard({
           )}
 
           <div className="flex items-start gap-4">
-            <Avatar
-              src={suggestion.dog.photoUrl}
-              alt={suggestion.dog.name}
-              size="md"
-              priority={priority}
-            />
+            <button type="button" onClick={() => openDogProfile(suggestion.dog.id)}>
+              <Avatar
+                src={suggestion.dog.photoUrl}
+                alt={suggestion.dog.name}
+                size="md"
+                priority={priority}
+              />
+            </button>
             <div className="flex-1 min-w-0">
               <p className="font-bold text-[15px] text-charcoal">
                 {suggestion.dog.name}

@@ -32,7 +32,7 @@ export default function VisitsScreen() {
     <div className="flex flex-col min-h-full">
       {/* Header */}
       <header
-        className="bg-navy text-white pt-[env(safe-area-inset-top)] pb-4 px-4 shrink-0"
+        className="bg-gradient-to-b from-navy to-[#0F2A45] text-white pt-[env(safe-area-inset-top)] pb-4 px-4 shrink-0"
         style={{ paddingTop: "calc(1rem + env(safe-area-inset-top))" }}
       >
         <h1 className="text-lg font-bold">Visit History</h1>

@@ -6,11 +6,13 @@ import { Bluetooth } from "lucide-react";
 import Avatar from "@/components/ui/Avatar";
 import { formatDurationFromSeconds } from "@/lib/dateHelpers";
 import type { Visit } from "@/types";
+import { useDogProfile } from "./DogProfileSheet";
 
 /**
  * Isolated component so the 1s timer only re-renders this card, not the entire Visits screen.
  */
 export default function ActiveVisitCard({ visit }: { visit: Visit }) {
+  const { openDogProfile } = useDogProfile();
   const [now, setNow] = useState(() => Date.now());
 
   useEffect(() => {
@@ -46,9 +48,11 @@ export default function ActiveVisitCard({ visit }: { visit: Visit }) {
         </p>
         <div className="flex -space-x-2">
           {visit.dogsEncountered.slice(0, 6).map((vd, i) => (
-            <div
+            <button
               key={vd.dog.id}
+              type="button"
               className="ring-2 ring-navy rounded-full"
+              onClick={() => openDogProfile(vd.dog.id)}
             >
               <Avatar
                 src={vd.dog.photoUrl}
@@ -56,7 +60,7 @@ export default function ActiveVisitCard({ visit }: { visit: Visit }) {
                 size="sm"
                 priority={i === 0}
               />
-            </div>
+            </button>
           ))}
         </div>
       </div>

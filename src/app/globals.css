@@ -73,3 +73,18 @@ textarea {
     letter-spacing: 0.05em;
   }
 }
+
+/* Subtle dot texture on off-white background */
+.bg-offwhite {
+  background-color: #F5F7FA;
+  background-image: radial-gradient(circle, #dfe4ea 0.5px, transparent 0.5px);
+  background-size: 16px 16px;
+}
+
+/* Card shadow transition on press */
+.shadow-sm {
+  transition: box-shadow 0.15s ease;
+}
+.shadow-sm:active {
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}

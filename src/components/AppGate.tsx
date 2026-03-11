@@ -1,7 +1,9 @@
 "use client";
 
+import { usePathname } from "next/navigation";
 import InitialLoadGate from "./InitialLoadGate";
 import OnboardingGate from "./OnboardingGate";
+import AppShell from "./AppShell";
 import PageTransition from "./PageTransition";
 
 export default function AppGate({
@@ -9,10 +11,19 @@ export default function AppGate({
 }: {
   children: React.ReactNode;
 }) {
+  const pathname = usePathname();
+  const isOnboarding = pathname === "/onboarding";
+
   return (
     <InitialLoadGate>
       <OnboardingGate>
-        <PageTransition>{children}</PageTransition>
+        {isOnboarding ? (
+          children
+        ) : (
+          <AppShell>
+            <PageTransition>{children}</PageTransition>
+          </AppShell>
+        )}
       </OnboardingGate>
     </InitialLoadGate>
   );

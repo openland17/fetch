@@ -22,6 +22,11 @@ const CARDS = [
     title: "Get Notified",
     body: "Know when your dog's friends arrive at a nearby park.",
   },
+  {
+    emoji: "📡",
+    title: "Your Dog Wears a Fetch Tag",
+    body: "A lightweight Bluetooth tag handles the rest — no phone needed at the park.",
+  },
 ];
 
 export default function OnboardingPage() {
@@ -70,9 +75,14 @@ export default function OnboardingPage() {
               transition={{ duration: 0.25 }}
               className="bg-white rounded-xl shadow-sm p-8 text-center"
             >
-              <span className="text-6xl block mb-6" aria-hidden>
+              <motion.span
+                className="text-6xl block mb-6"
+                aria-hidden
+                animate={{ y: [0, -6, 0] }}
+                transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
+              >
                 {CARDS[index].emoji}
-              </span>
+              </motion.span>
               <h2 className="text-xl font-bold text-charcoal mb-3">
                 {CARDS[index].title}
               </h2>
@@ -104,10 +114,15 @@ export default function OnboardingPage() {
           <motion.button
             type="button"
             onClick={handleGetStarted}
-            className="w-full py-4 rounded-xl bg-blue text-white font-bold text-base"
+            className="relative w-full py-4 rounded-xl bg-blue text-white font-bold text-base overflow-hidden"
             whileTap={{ scale: 0.95 }}
           >
-            Get Started
+            <span className="relative z-10">Get Started</span>
+            <motion.div
+              className="absolute inset-0 bg-gradient-to-r from-transparent via-white/25 to-transparent"
+              animate={{ x: ["-100%", "100%"] }}
+              transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+            />
           </motion.button>
         ) : (
           <motion.button

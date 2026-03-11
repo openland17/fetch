@@ -2,6 +2,8 @@
 
 import { ReactNode, useEffect, useState } from "react";
 import BottomNav from "./BottomNav";
+import { DogProfileProvider } from "./DogProfileSheet";
+import AddToHomeBanner from "./AddToHomeBanner";
 
 export default function AppShell({ children }: { children: ReactNode }) {
   const [origin, setOrigin] = useState<string>("");
@@ -23,6 +25,7 @@ export default function AppShell({ children }: { children: ReactNode }) {
           }}
           aria-hidden
         />
+        <DogProfileProvider>
         <div className="flex flex-col h-full min-h-safe-screen md:min-h-[900px] md:h-[900px] bg-offwhite md:rounded-[2rem] overflow-hidden relative">
           <main
             className="flex-1 overflow-auto overflow-x-hidden flex flex-col scroll-touch"
@@ -31,7 +34,9 @@ export default function AppShell({ children }: { children: ReactNode }) {
             {children}
           </main>
           <BottomNav />
+          <AddToHomeBanner />
         </div>
+        </DogProfileProvider>
       </div>
       {/* Desktop-only hint with URL */}
       <p className="hidden md:block mt-6 text-center text-white/80 text-sm px-4">

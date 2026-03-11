@@ -1,9 +1,11 @@
 "use client";
 
+import { useMemo } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { MapPin, Heart, Clock, Settings } from "lucide-react";
 import { motion } from "framer-motion";
+import { useApp } from "@/hooks/useAppState";
 
 const tabs = [
   { href: "/", label: "Parks", icon: MapPin },
@@ -14,6 +16,12 @@ const tabs = [
 
 export default function BottomNav() {
   const pathname = usePathname();
+  const { state } = useApp();
+  const unreadCount = useMemo(
+    () => state.notifications.filter((n) => !n.read).length,
+    [state.notifications]
+  );
+  const isOnParks = pathname === "/" || pathname.startsWith("/park/");
 
   return (
     <nav
@@ -36,7 +44,7 @@ export default function BottomNav() {
               className="flex flex-col items-center justify-center gap-0.5 min-w-[64px] min-h-[44px] py-2 rounded-xl transition-colors"
             >
               <motion.span
-                className={`flex items-center justify-center rounded-xl px-3 py-1.5 ${
+                className={`relative flex items-center justify-center rounded-xl px-3 py-1.5 ${
                   isActive ? "bg-blue/20 ring-2 ring-blue/40" : ""
                 }`}
                 animate={{ scale: isActive ? 1.02 : 1 }}
@@ -48,6 +56,9 @@ export default function BottomNav() {
                   className={isActive ? "text-blue" : "text-grey"}
                   strokeWidth={2.25}
                 />
+                {href === "/" && !isOnParks && unreadCount > 0 && (
+                  <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-orange border-2 border-white" />
+                )}
               </motion.span>
               <span
                 className={`text-xs ${

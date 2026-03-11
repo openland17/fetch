@@ -46,6 +46,12 @@ export const PARKS: Park[] = [
       ["ziggy", false, 7],
       ["rex", false, 35],
     ]),
+    recentActivity: [
+      { text: "Bella arrived", minutesAgo: 8 },
+      { text: "Scout and Cooper played for 12 min", minutesAgo: 15 },
+      { text: "Hugo left after 40 min", minutesAgo: 22 },
+      { text: "Rex arrived", minutesAgo: 35 },
+    ],
   },
   {
     id: "newstead",
@@ -69,6 +75,13 @@ export const PARKS: Park[] = [
       ["coco", false, 8],
       ["archie", false, 40],
     ]),
+    recentActivity: [
+      { text: "Bella arrived", minutesAgo: 2 },
+      { text: "Luna and Cooper played for 14 min", minutesAgo: 5 },
+      { text: "Rex arrived", minutesAgo: 12 },
+      { text: "Milo arrived", minutesAgo: 3 },
+      { text: "Coco left after 25 min", minutesAgo: 18 },
+    ],
   },
   {
     id: "teralba",
@@ -135,6 +148,11 @@ export const PARKS: Park[] = [
       ["hugo", false, 32],
       ["daisy", false, 8],
     ]),
+    recentActivity: [
+      { text: "Charlie arrived", minutesAgo: 6 },
+      { text: "Ziggy and Hugo played for 20 min", minutesAgo: 14 },
+      { text: "Daisy arrived", minutesAgo: 8 },
+    ],
   },
   {
     id: "riverside",

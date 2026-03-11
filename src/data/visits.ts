@@ -26,6 +26,7 @@ function encounter(
 export const VISITS_INITIAL: Visit[] = [
   {
     id: "v-newstead-today",
+    parkId: "newstead",
     parkName: "Newstead Park",
     date: new Date().toISOString(),
     durationMinutes: 42,
@@ -35,11 +36,10 @@ export const VISITS_INITIAL: Visit[] = [
       ["rex", 6, false, true],
       ["milo", 3, false, false],
     ]),
-    isActive: true,
-    startedAt: new Date(Date.now() - 15 * 60 * 1000).toISOString(),
   },
   {
     id: "v-colmslie-yesterday",
+    parkId: "colmslie",
     parkName: "Colmslie Reserve",
     date: new Date(Date.now() - 86400000).toISOString(),
     durationMinutes: 35,
@@ -50,6 +50,7 @@ export const VISITS_INITIAL: Visit[] = [
   },
   {
     id: "v-newfarm-2d",
+    parkId: "new-farm",
     parkName: "New Farm Park",
     date: new Date(Date.now() - 2 * 86400000).toISOString(),
     durationMinutes: 55,
@@ -61,6 +62,7 @@ export const VISITS_INITIAL: Visit[] = [
   },
   {
     id: "v-newstead-4d",
+    parkId: "newstead",
     parkName: "Newstead Park",
     date: new Date(Date.now() - 4 * 86400000).toISOString(),
     durationMinutes: 38,
@@ -71,6 +73,7 @@ export const VISITS_INITIAL: Visit[] = [
   },
   {
     id: "v-newfarm-1w",
+    parkId: "new-farm",
     parkName: "New Farm Park",
     date: new Date(Date.now() - 7 * 86400000).toISOString(),
     durationMinutes: 45,
@@ -81,6 +84,7 @@ export const VISITS_INITIAL: Visit[] = [
   },
   {
     id: "v-sunset-1w",
+    parkId: "sunset",
     parkName: "Sunset Park",
     date: new Date(Date.now() - 7 * 86400000).toISOString(),
     durationMinutes: 30,
@@ -91,6 +95,7 @@ export const VISITS_INITIAL: Visit[] = [
   },
   {
     id: "v-newstead-10d",
+    parkId: "newstead",
     parkName: "Newstead Park",
     date: new Date(Date.now() - 10 * 86400000).toISOString(),
     durationMinutes: 50,
@@ -102,6 +107,7 @@ export const VISITS_INITIAL: Visit[] = [
   },
   {
     id: "v-colmslie-2w",
+    parkId: "colmslie",
     parkName: "Colmslie Reserve",
     date: new Date(Date.now() - 14 * 86400000).toISOString(),
     durationMinutes: 40,
@@ -112,6 +118,7 @@ export const VISITS_INITIAL: Visit[] = [
   },
   {
     id: "v-riverside-3w",
+    parkId: "riverside",
     parkName: "Riverside Dog Park",
     date: new Date(Date.now() - 21 * 86400000).toISOString(),
     durationMinutes: 28,

@@ -14,11 +14,13 @@ import type {
   FriendshipSuggestion,
   Notification,
   Visit,
+  VisitDog,
 } from "@/types";
 import { FRIENDSHIPS_INITIAL } from "@/data/friendships";
 import { FRIENDSHIP_SUGGESTIONS_INITIAL } from "@/data/friendships";
 import { NOTIFICATIONS_INITIAL } from "@/data/notifications";
 import { VISITS_INITIAL } from "@/data/visits";
+import { getParkById } from "@/data/parks";
 
 const STORAGE_KEY = "fetch-app-state";
 
@@ -44,7 +46,7 @@ function getDefaultState(): AppState {
     currentScreen: null,
     friendships: FRIENDSHIPS_INITIAL,
     suggestions: FRIENDSHIP_SUGGESTIONS_INITIAL,
-    isCheckedIn: true,
+    isCheckedIn: false,
     invisibleMode: false,
     notificationPrefs: { friendAlerts: true, visitSummaries: true },
     notifications: NOTIFICATIONS_INITIAL,
@@ -93,10 +95,13 @@ interface AppContextValue {
   addFriendFromSuggestion: (suggestionId: string) => void;
   dismissSuggestion: (suggestionId: string) => void;
   setCheckedIn: (checkedIn: boolean) => void;
+  checkIn: (parkId: string) => void;
+  endVisit: () => void;
   setInvisibleMode: (on: boolean) => void;
   setNotificationPrefs: (prefs: Partial<AppState["notificationPrefs"]>) => void;
   markNotificationRead: (id: string) => void;
   markAllNotificationsRead: () => void;
+  dismissNotification: (id: string) => void;
   setCurrentScreen: (screen: string | null) => void;
 }
 
@@ -115,6 +120,56 @@ export function AppStateProvider({ children }: { children: ReactNode }) {
 
   const setCheckedIn = useCallback((checkedIn: boolean) => {
     setState((prev) => ({ ...prev, isCheckedIn: checkedIn }));
+  }, []);
+
+  const checkIn = useCallback((parkId: string) => {
+    setState((prev) => {
+      if (prev.isCheckedIn) return prev;
+      const park = getParkById(parkId);
+      if (!park) return prev;
+      const friendIds = new Set(prev.friendships.map((f) => f.dog.id));
+      const suggestionIds = new Set(prev.suggestions.map((s) => s.dog.id));
+      const dogsEncountered: VisitDog[] = park.activeDogs.map((pd) => ({
+        dog: pd.dog,
+        minutesNear: 0,
+        isFriend: friendIds.has(pd.dog.id),
+        hasPendingSuggestion: suggestionIds.has(pd.dog.id),
+      }));
+      const newVisit: Visit = {
+        id: `v-${parkId}-${Date.now()}`,
+        parkId,
+        parkName: park.name,
+        date: new Date().toISOString(),
+        durationMinutes: 0,
+        dogsEncountered,
+        isActive: true,
+        startedAt: new Date().toISOString(),
+      };
+      return {
+        ...prev,
+        isCheckedIn: true,
+        visits: [newVisit, ...prev.visits],
+      };
+    });
+  }, []);
+
+  const endVisit = useCallback(() => {
+    setState((prev) => {
+      const activeIdx = prev.visits.findIndex((v) => v.isActive);
+      if (activeIdx === -1) return { ...prev, isCheckedIn: false };
+      const active = prev.visits[activeIdx];
+      const elapsed = active.startedAt
+        ? Math.round((Date.now() - new Date(active.startedAt).getTime()) / 60000)
+        : active.durationMinutes;
+      const updated: Visit = {
+        ...active,
+        isActive: false,
+        durationMinutes: Math.max(1, elapsed),
+      };
+      const visits = [...prev.visits];
+      visits[activeIdx] = updated;
+      return { ...prev, isCheckedIn: false, visits };
+    });
   }, []);
 
   const setInvisibleMode = useCallback((on: boolean) => {
@@ -180,6 +235,13 @@ export function AppStateProvider({ children }: { children: ReactNode }) {
     }));
   }, []);
 
+  const dismissNotification = useCallback((id: string) => {
+    setState((prev) => ({
+      ...prev,
+      notifications: prev.notifications.filter((n) => n.id !== id),
+    }));
+  }, []);
+
   const value = useMemo<AppContextValue>(
     () => ({
       state,
@@ -187,10 +249,13 @@ export function AppStateProvider({ children }: { children: ReactNode }) {
       addFriendFromSuggestion,
       dismissSuggestion,
       setCheckedIn,
+      checkIn,
+      endVisit,
       setInvisibleMode,
       setNotificationPrefs,
       markNotificationRead,
       markAllNotificationsRead,
+      dismissNotification,
       setCurrentScreen,
     }),
     [
@@ -198,10 +263,13 @@ export function AppStateProvider({ children }: { children: ReactNode }) {
       addFriendFromSuggestion,
       dismissSuggestion,
       setCheckedIn,
+      checkIn,
+      endVisit,
       setInvisibleMode,
       setNotificationPrefs,
       markNotificationRead,
       markAllNotificationsRead,
+      dismissNotification,
       setCurrentScreen,
     ]
   );

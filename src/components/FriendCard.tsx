@@ -4,6 +4,8 @@ import type { Friendship } from "@/types";
 import Avatar from "@/components/ui/Avatar";
 import { ChevronRight } from "lucide-react";
 import { motion } from "framer-motion";
+import { useDogProfile } from "./DogProfileSheet";
+import { getMilestone } from "@/lib/milestones";
 
 interface FriendCardProps {
   friend: Friendship;
@@ -20,11 +22,15 @@ export default function FriendCard({ friend, priority = false }: FriendCardProps
   const { dog, totalMinutesTogether, totalEncounters, lastSeenAt } = friend;
   const lastSeenText =
     lastSeenAt.startsWith("At ") ? lastSeenAt.slice(3) : lastSeenAt;
+  const { openDogProfile } = useDogProfile();
 
   return (
     <motion.div
-      className="bg-white rounded-xl shadow-sm p-4 flex items-center gap-4"
+      className="bg-white rounded-xl shadow-sm p-4 flex items-center gap-4 cursor-pointer"
       whileTap={{ scale: 0.98 }}
+      role="button"
+      tabIndex={0}
+      onClick={() => openDogProfile(dog.id)}
     >
       <Avatar
         src={dog.photoUrl}
@@ -34,7 +40,12 @@ export default function FriendCard({ friend, priority = false }: FriendCardProps
         priority={priority}
       />
       <div className="flex-1 min-w-0">
-        <p className="font-bold text-[15px] text-charcoal truncate">{dog.name}</p>
+        <div className="flex items-center gap-1.5">
+          <p className="font-bold text-[15px] text-charcoal truncate">{dog.name}</p>
+          <span className="text-xs shrink-0" title={getMilestone(totalEncounters, totalMinutesTogether).label}>
+            {getMilestone(totalEncounters, totalMinutesTogether).emoji}
+          </span>
+        </div>
         <p className="text-xs text-grey mt-0.5">{dog.breed}</p>
         <p className="text-xs text-grey mt-1">
           🕐 {formatHours(totalMinutesTogether)} together · 📍 {totalEncounters}{" "}

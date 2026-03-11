@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { CheckCircle } from "lucide-react";
-import type { Notification } from "@/types";
+import type { Notification, NotificationType } from "@/types";
 import { getRelativeTime } from "@/lib/relativeTime";
 
 interface NotificationDropdownProps {
@@ -12,13 +12,15 @@ interface NotificationDropdownProps {
   notifications: Notification[];
   onMarkAllRead: () => void;
   onNotificationTap: (n: Notification) => void;
+  onDismiss?: (id: string) => void;
 }
 
-function getNotificationIcon(type: Notification["type"]) {
-  if (type === "friend_alert") return "🐕";
-  if (type === "visit_summary") return "📍";
-  return "⭐";
-}
+const typeConfig: Record<NotificationType, { icon: string; accent: string; bg: string }> = {
+  friend_alert: { icon: "🐕", accent: "border-l-orange", bg: "bg-lightorange/30" },
+  visit_summary: { icon: "📍", accent: "border-l-blue", bg: "bg-lightblue/30" },
+  friendship_suggestion: { icon: "✨", accent: "border-l-blue", bg: "bg-lightblue/30" },
+  friendship_confirmed: { icon: "🎉", accent: "border-l-success", bg: "bg-success/10" },
+};
 
 export default function NotificationDropdown({
   open,
@@ -26,6 +28,7 @@ export default function NotificationDropdown({
   notifications,
   onMarkAllRead,
   onNotificationTap,
+  onDismiss,
 }: NotificationDropdownProps) {
   const router = useRouter();
   const unreadCount = notifications.filter((n) => !n.read).length;
@@ -33,8 +36,13 @@ export default function NotificationDropdown({
   const handleTap = (n: Notification) => {
     onNotificationTap(n);
     onClose();
-    if (n.parkId) router.push(`/park/${n.parkId}`);
-    else if (n.type === "friendship_suggestion") router.push("/friends");
+    if (n.type === "friendship_suggestion" || n.type === "friendship_confirmed") {
+      router.push("/friends");
+    } else if (n.type === "visit_summary") {
+      router.push("/visits");
+    } else if (n.parkId) {
+      router.push(`/park/${n.parkId}`);
+    }
   };
 
   return (
@@ -67,9 +75,7 @@ export default function NotificationDropdown({
               {unreadCount > 0 && (
                 <button
                   type="button"
-                  onClick={() => {
-                    onMarkAllRead();
-                  }}
+                  onClick={onMarkAllRead}
                   className="min-h-[44px] min-w-[44px] -my-1 flex items-center justify-center text-xs text-blue font-medium gap-1"
                 >
                   <CheckCircle size={14} strokeWidth={2} />
@@ -83,31 +89,49 @@ export default function NotificationDropdown({
                   No notifications
                 </div>
               ) : (
-                notifications.map((n) => (
-                  <button
-                    key={n.id}
-                    type="button"
-                    className={`w-full p-4 flex items-start gap-3 text-left border-b border-grey/10 last:border-0 min-h-[44px] ${
-                      !n.read ? "bg-lightblue/30" : ""
-                    }`}
-                    onClick={() => handleTap(n)}
-                  >
-                    <span className="text-lg shrink-0">
-                      {getNotificationIcon(n.type)}
-                    </span>
-                    <div className="flex-1 min-w-0">
-                      <p className="font-medium text-charcoal text-sm">
-                        {n.title ?? "Notification"}
-                      </p>
-                      <p className="text-xs text-grey mt-0.5 line-clamp-2">
-                        {n.body ?? ""}
-                      </p>
-                      <p className="text-xs text-grey mt-1">
-                        {getRelativeTime(n.timestamp)}
-                      </p>
-                    </div>
-                  </button>
-                ))
+                <AnimatePresence initial={false}>
+                  {notifications.map((n) => {
+                    const config = typeConfig[n.type] ?? typeConfig.friend_alert;
+                    return (
+                      <motion.div
+                        key={n.id}
+                        layout
+                        exit={{ opacity: 0, x: -200, height: 0 }}
+                        transition={{ duration: 0.25 }}
+                        drag="x"
+                        dragConstraints={{ left: 0, right: 0 }}
+                        dragElastic={0.3}
+                        onDragEnd={(_, info) => {
+                          if (info.offset.x < -80 && onDismiss) {
+                            onDismiss(n.id);
+                          }
+                        }}
+                      >
+                        <button
+                          type="button"
+                          className={`w-full p-4 flex items-start gap-3 text-left border-b border-grey/10 last:border-0 min-h-[44px] border-l-4 ${config.accent} ${!n.read ? config.bg : ""}`}
+                          onClick={() => handleTap(n)}
+                        >
+                          <span className="text-lg shrink-0">{config.icon}</span>
+                          <div className="flex-1 min-w-0">
+                            <p className="font-medium text-charcoal text-sm">
+                              {n.title}
+                            </p>
+                            <p className="text-xs text-grey mt-0.5 line-clamp-2">
+                              {n.body}
+                            </p>
+                            <p className="text-xs text-grey mt-1">
+                              {getRelativeTime(n.timestamp)}
+                            </p>
+                          </div>
+                          {!n.read && (
+                            <span className="w-2 h-2 rounded-full bg-blue shrink-0 mt-1.5" />
+                          )}
+                        </button>
+                      </motion.div>
+                    );
+                  })}
+                </AnimatePresence>
               )}
             </div>
           </motion.div>

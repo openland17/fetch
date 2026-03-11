@@ -5,6 +5,7 @@ import Avatar from "@/components/ui/Avatar";
 import Badge from "@/components/ui/Badge";
 import { motion } from "framer-motion";
 import { twMerge } from "tailwind-merge";
+import { useDogProfile } from "./DogProfileSheet";
 
 interface DogAtParkCardProps {
   dog: Dog;
@@ -21,8 +22,12 @@ export default function DogAtParkCard({
   hasPendingSuggestion,
   priority = false,
 }: DogAtParkCardProps) {
+  const { openDogProfile } = useDogProfile();
   return (
     <motion.div
+      role="button"
+      tabIndex={0}
+      onClick={() => openDogProfile(dog.id)}
       className={twMerge(
         "rounded-xl shadow-sm p-4 flex items-center gap-4 bg-white",
         isFriend && "border-l-4 border-l-orange bg-lightorange",
