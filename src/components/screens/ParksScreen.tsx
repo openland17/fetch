@@ -128,11 +128,12 @@ export default function ParksScreen() {
     [parkFriendCounts]
   );
 
-  const checkedInPark = useMemo(() => {
-    if (!state.isCheckedIn) return null;
-    const active = state.visits.find((v) => v.isActive);
-    return active ? active.parkName : null;
-  }, [state.isCheckedIn, state.visits]);
+  const activeVisit = useMemo(
+    () => state.visits.find((v) => v.isActive),
+    [state.visits]
+  );
+  const checkedInPark = state.isCheckedIn && activeVisit ? activeVisit.parkName : null;
+  const checkedInParkId = state.isCheckedIn && activeVisit ? activeVisit.parkId : null;
 
   const toggleFilter = useCallback((f: string) => {
     setActiveFilters((prev) => {
@@ -236,8 +237,12 @@ export default function ParksScreen() {
             ⭐ {totalFriendsNearby} friends nearby
           </span>
           {checkedInPark && (
-            <span className="shrink-0 max-w-[180px] rounded-full bg-success/90 text-white text-xs font-medium px-3 py-1.5 truncate">
-              📍 {checkedInPark}
+            <span className="shrink-0 max-w-[200px] rounded-full bg-success/90 text-white text-xs font-medium px-3 py-1.5 flex items-center gap-1.5">
+              <span className="relative flex h-2 w-2 shrink-0">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75" />
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-white" />
+              </span>
+              <span className="truncate">{checkedInPark}</span>
             </span>
           )}
         </div>
@@ -260,7 +265,7 @@ export default function ParksScreen() {
             placeholder="Search parks..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-9 pr-8 py-2.5 text-sm rounded-xl bg-white border border-grey/20 text-charcoal placeholder:text-grey/60 focus:outline-none focus:ring-2 focus:ring-blue/30"
+            className="w-full pl-9 pr-8 py-2.5 text-sm rounded-xl bg-white shadow-sm border border-grey/10 text-charcoal placeholder:text-grey/40 focus:outline-none focus:ring-2 focus:ring-blue/30 focus:border-blue/20"
           />
           {searchQuery && (
             <button
@@ -373,6 +378,7 @@ export default function ParksScreen() {
                   park={park}
                   index={index}
                   friendCountOverride={parkFriendCounts.get(park.id)}
+                  isCheckedInHere={checkedInParkId === park.id}
                 />
               ))}
             </div>

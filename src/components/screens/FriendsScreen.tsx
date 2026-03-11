@@ -30,7 +30,6 @@ export default function FriendsScreen() {
 
   return (
     <div className="flex flex-col min-h-full">
-      {/* Header */}
       <header
         className="bg-gradient-to-b from-navy to-[#0F2A45] text-white pt-[env(safe-area-inset-top)] pb-4 px-4 shrink-0"
         style={{ paddingTop: "calc(1rem + env(safe-area-inset-top))" }}
@@ -54,7 +53,7 @@ export default function FriendsScreen() {
             <span className="text-6xl mb-4" aria-hidden>
               🐕
             </span>
-            <p className="text-charcoal font-medium text-base mb-2">
+            <p className="text-charcoal font-semibold text-base mb-2">
               Take Cooper to the park to start making friends!
             </p>
             <p className="text-grey text-sm mb-6">
@@ -69,14 +68,13 @@ export default function FriendsScreen() {
           </div>
         ) : (
           <>
-            {/* Pending suggestions */}
             {hasSuggestions && (
-              <section className="bg-lightblue px-4 py-4">
+              <section className="bg-gradient-to-b from-lightblue to-offwhite px-4 py-4 rounded-b-2xl">
                 <div className="flex items-center gap-2 mb-3">
-                  <span
-                    className="w-2 h-2 rounded-full bg-orange shrink-0"
-                    aria-hidden
-                  />
+                  <span className="relative flex h-2 w-2 shrink-0">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange opacity-75" />
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-orange" />
+                  </span>
                   <p className="section-label mb-0">
                     NEW MATCHES
                   </p>
@@ -97,18 +95,23 @@ export default function FriendsScreen() {
               </section>
             )}
 
-            {/* Confirmed friends */}
             <section className="px-4 py-4">
               <p className="section-label">
                 CONFIRMED FRIENDS
               </p>
               <div className="space-y-3">
                 {sortedFriends.map((friend, i) => (
-                  <FriendCard
+                  <motion.div
                     key={friend.id}
-                    friend={friend}
-                    priority={!hasSuggestions && i === 0}
-                  />
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.2, delay: i * 0.04 }}
+                  >
+                    <FriendCard
+                      friend={friend}
+                      priority={!hasSuggestions && i === 0}
+                    />
+                  </motion.div>
                 ))}
               </div>
             </section>

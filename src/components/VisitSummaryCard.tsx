@@ -31,7 +31,7 @@ export default function VisitSummaryCard({ visit }: VisitSummaryCardProps) {
 
   return (
     <motion.div
-      className="bg-white rounded-xl shadow-sm overflow-hidden"
+      className="bg-white rounded-xl shadow-sm border border-grey/10 overflow-hidden"
       layout
       whileTap={{ scale: 0.98 }}
     >
@@ -40,11 +40,11 @@ export default function VisitSummaryCard({ visit }: VisitSummaryCardProps) {
         className="w-full p-4 min-h-[44px] flex items-center gap-3 text-left"
         onClick={() => setExpanded((e) => !e)}
       >
-        <span className="shrink-0 rounded-lg bg-lightblue text-blue text-xs font-semibold px-2.5 py-1.5">
+        <span className="shrink-0 rounded-full bg-lightblue text-blue text-xs font-medium px-2.5 py-1">
           {dateLabel}
         </span>
         <div className="flex-1 min-w-0">
-          <p className="font-bold text-[15px] text-charcoal truncate">
+          <p className="font-semibold text-[15px] text-charcoal truncate">
             {visit.parkName}
           </p>
           <p className="text-xs text-grey">{durationText}</p>

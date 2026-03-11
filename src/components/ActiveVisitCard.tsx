@@ -2,16 +2,19 @@
 
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Bluetooth } from "lucide-react";
+import { Bluetooth, LogOut } from "lucide-react";
 import Avatar from "@/components/ui/Avatar";
+import Button from "@/components/ui/Button";
 import { formatDurationFromSeconds } from "@/lib/dateHelpers";
 import type { Visit } from "@/types";
 import { useDogProfile } from "./DogProfileSheet";
 
-/**
- * Isolated component so the 1s timer only re-renders this card, not the entire Visits screen.
- */
-export default function ActiveVisitCard({ visit }: { visit: Visit }) {
+interface ActiveVisitCardProps {
+  visit: Visit;
+  onEndVisit?: () => void;
+}
+
+export default function ActiveVisitCard({ visit, onEndVisit }: ActiveVisitCardProps) {
   const { openDogProfile } = useDogProfile();
   const [now, setNow] = useState(() => Date.now());
 
@@ -27,23 +30,26 @@ export default function ActiveVisitCard({ visit }: { visit: Visit }) {
 
   return (
     <motion.div
-      className="rounded-xl bg-navy p-4 mb-4 text-white"
+      className="rounded-2xl bg-gradient-to-br from-navy to-[#0F2A45] p-5 mb-4 text-white shadow-lg"
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.2 }}
     >
       <div className="flex items-center gap-2 mb-3">
-        <span className="w-2.5 h-2.5 rounded-full bg-blue animate-pulse" />
+        <span className="relative flex h-2.5 w-2.5">
+          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-success opacity-75" />
+          <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-success" />
+        </span>
         <span className="text-sm font-medium">
           📍 Currently at {visit.parkName}
         </span>
       </div>
 
-      <p className="text-2xl font-bold tabular-nums">{durationDisplay}</p>
-      <p className="text-xs text-white/70 mt-0.5">Duration</p>
+      <p className="text-4xl font-bold tabular-nums tracking-tight">{durationDisplay}</p>
+      <p className="text-xs text-white/60 mt-0.5">Duration</p>
 
       <div className="mt-4">
-        <p className="text-xs text-white/80 mb-2">
+        <p className="text-xs text-white/70 mb-2">
           Dogs nearby: {visit.dogsEncountered.length}
         </p>
         <div className="flex -space-x-2">
@@ -65,9 +71,21 @@ export default function ActiveVisitCard({ visit }: { visit: Visit }) {
         </div>
       </div>
 
-      <div className="mt-4 flex items-center gap-2 text-white/70">
-        <Bluetooth size={16} strokeWidth={2} className="animate-pulse" />
-        <span className="text-xs">Scanning...</span>
+      <div className="mt-4 flex items-center justify-between">
+        <div className="flex items-center gap-2 text-white/50">
+          <Bluetooth size={14} strokeWidth={2} className="animate-pulse" />
+          <span className="text-xs">Scanning...</span>
+        </div>
+        {onEndVisit && (
+          <Button
+            variant="danger"
+            size="sm"
+            onClick={onEndVisit}
+          >
+            <LogOut size={14} strokeWidth={2.5} />
+            End Visit
+          </Button>
+        )}
       </div>
     </motion.div>
   );

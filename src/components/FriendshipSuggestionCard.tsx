@@ -58,8 +58,8 @@ export default function FriendshipSuggestionCard({
       transition={{ duration: 0.3 }}
       whileTap={{ scale: 0.98 }}
           className={twMerge(
-            "rounded-xl shadow-sm p-4 border-l-4 border-l-blue bg-lightblue overflow-hidden relative",
-            status === "added" && "border-l-orange bg-lightorange"
+            "rounded-xl shadow-md border border-blue/10 p-4 border-l-4 border-l-blue bg-white overflow-hidden relative",
+            status === "added" && "border-l-orange bg-lightorange border-orange/10"
           )}
         >
           {status === "added" && (
@@ -130,15 +130,14 @@ export default function FriendshipSuggestionCard({
                 <>Add Friend ✓</>
               )}
             </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              className="flex-1 border-grey text-grey"
+            <button
+              type="button"
+              className="flex-1 text-sm text-grey/60 font-medium py-2 rounded-xl active:bg-grey/10 disabled:opacity-50"
               onClick={handleDismiss}
               disabled={status !== "idle"}
             >
               Not now
-            </Button>
+            </button>
           </div>
         </motion.div>
   );

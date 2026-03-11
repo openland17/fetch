@@ -4,17 +4,18 @@ import Link from "next/link";
 import { forwardRef } from "react";
 import type { Park } from "@/types";
 import Badge from "@/components/ui/Badge";
+import { ChevronRight } from "lucide-react";
 import { motion } from "framer-motion";
 
 interface ParkCardProps {
   park: Park;
   index: number;
-  /** When provided, overrides park.friendCount (e.g. from live app state). */
   friendCountOverride?: number;
+  isCheckedInHere?: boolean;
 }
 
 const ParkCard = forwardRef<HTMLDivElement, ParkCardProps>(
-  function ParkCard({ park, index, friendCountOverride }, ref) {
+  function ParkCard({ park, index, friendCountOverride, isCheckedInHere }, ref) {
     const friendCount =
       friendCountOverride !== undefined ? friendCountOverride : park.friendCount;
     const hasFriends = friendCount > 0;
@@ -29,30 +30,39 @@ const ParkCard = forwardRef<HTMLDivElement, ParkCardProps>(
       <Link href={`/park/${park.id}`}>
         <motion.div
           className={`
-            rounded-xl shadow-sm p-4 flex items-start justify-between gap-3 min-h-[44px]
-            ${hasFriends ? "border-l-4 border-l-orange bg-lightorange/40" : "bg-white"}
+            rounded-xl shadow-sm border p-4 flex items-start gap-3 min-h-[44px]
+            ${hasFriends ? "border-l-4 border-l-orange bg-lightorange/30 border-orange/20" : "bg-white border-grey/10"}
+            ${isCheckedInHere ? "ring-2 ring-success/40" : ""}
           `}
-          whileTap={{ scale: 0.98 }}
+          whileTap={{ scale: 0.97 }}
         >
           <div className="min-w-0 flex-1">
-            <h3 className="font-bold text-[15px] text-charcoal truncate">{park.name}</h3>
-            <p className="text-xs text-grey mt-0.5">{park.suburb}</p>
+            <div className="flex items-center gap-2">
+              <h3 className="font-semibold text-[15px] text-charcoal truncate">{park.name}</h3>
+              {isCheckedInHere && (
+                <span className="inline-flex items-center gap-1 bg-success/10 text-success text-[10px] font-semibold rounded-full px-2 py-0.5 shrink-0">
+                  <span className="w-1.5 h-1.5 rounded-full bg-success animate-pulse" />
+                  You&apos;re here
+                </span>
+              )}
+            </div>
             <p className="text-xs text-grey mt-0.5">
-              {Number.isFinite(park.distanceKm)
-                ? `${Number(park.distanceKm).toFixed(1)} km away`
-                : "—"}
+              {park.suburb} · {Number.isFinite(park.distanceKm) ? `${Number(park.distanceKm).toFixed(1)} km` : "—"}
             </p>
-          </div>
-          <div className="flex flex-col items-end shrink-0">
-            <span className="text-2xl font-bold text-blue leading-none">
-              {Math.max(0, park.activeDogs?.length ?? park.activeDogCount ?? 0)}
-            </span>
-            <span className="text-xs text-grey mt-1">dogs now</span>
             {hasFriends && (
-              <Badge variant="orange" className="mt-2">
+              <span className="inline-flex items-center bg-orange/10 text-orange rounded-full px-2 py-0.5 text-xs font-medium mt-1.5">
                 ⭐ {friendCount} friend{friendCount !== 1 ? "s" : ""}
-              </Badge>
+              </span>
             )}
+          </div>
+          <div className="flex items-center gap-2 shrink-0">
+            <div className="text-right">
+              <span className="text-2xl font-bold text-blue leading-none">
+                {Math.max(0, park.activeDogs?.length ?? park.activeDogCount ?? 0)}
+              </span>
+              <p className="text-[11px] text-grey mt-0.5">dogs now</p>
+            </div>
+            <ChevronRight size={18} className="text-grey/40" strokeWidth={2} />
           </div>
         </motion.div>
       </Link>

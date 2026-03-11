@@ -55,13 +55,32 @@ function getDefaultState(): AppState {
   };
 }
 
+const MAX_VISIT_MS = 3 * 60 * 60 * 1000; // 3 hours
+
+function sanitizeVisits(visits: Visit[], isCheckedIn: boolean): { visits: Visit[]; isCheckedIn: boolean } {
+  let checkedIn = isCheckedIn;
+  const sanitized = visits.map((v) => {
+    if (!v.isActive) return v;
+    if (v.startedAt) {
+      const elapsed = Date.now() - new Date(v.startedAt).getTime();
+      if (elapsed > MAX_VISIT_MS || elapsed < 0) {
+        checkedIn = false;
+        return { ...v, isActive: false, durationMinutes: Math.min(180, Math.max(1, Math.round(elapsed / 60000))) };
+      }
+    }
+    return v;
+  });
+  if (checkedIn && !sanitized.some((v) => v.isActive)) checkedIn = false;
+  return { visits: sanitized, isCheckedIn: checkedIn };
+}
+
 function loadState(): AppState {
   if (typeof window === "undefined") return getDefaultState();
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return getDefaultState();
     const parsed = JSON.parse(raw) as Partial<AppState>;
-    return {
+    const base: AppState = {
           ...getDefaultState(),
           ...parsed,
           friendships: parsed.friendships ?? getDefaultState().friendships,
@@ -73,6 +92,8 @@ function loadState(): AppState {
           dismissedSuggestions:
             parsed.dismissedSuggestions ?? getDefaultState().dismissedSuggestions,
         };
+    const { visits, isCheckedIn } = sanitizeVisits(base.visits, base.isCheckedIn);
+    return { ...base, visits, isCheckedIn };
   } catch {
     return getDefaultState();
   }
@@ -164,7 +185,7 @@ export function AppStateProvider({ children }: { children: ReactNode }) {
       const updated: Visit = {
         ...active,
         isActive: false,
-        durationMinutes: Math.max(1, elapsed),
+        durationMinutes: Math.min(180, Math.max(1, elapsed)),
       };
       const visits = [...prev.visits];
       visits[activeIdx] = updated;

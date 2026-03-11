@@ -108,24 +108,29 @@ export default function SettingsScreen() {
         style={{ paddingBottom: "var(--scroll-padding-bottom)" }}
       >
         {/* Dog profile card */}
-        <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
+        <div className="bg-white rounded-2xl shadow-sm border border-grey/10 p-6 mb-6 mt-4">
           <div className="flex flex-col items-center text-center">
-            <Avatar
-              src={MY_DOG.photoUrl}
-              alt={MY_DOG.name}
-              size="xl"
-              priority
-            />
+            <div className="ring-4 ring-lightblue rounded-full">
+              <Avatar
+                src={MY_DOG.photoUrl}
+                alt={MY_DOG.name}
+                size="xl"
+                priority
+              />
+            </div>
             <h2 className="mt-4 font-bold text-[18px] text-charcoal">
               {MY_DOG.name}
             </h2>
-            <p className="text-[13px] text-grey mt-0.5">
+            <p className="text-sm text-grey mt-0.5">
               {MY_DOG.breed} · {MY_DOG.colour}
             </p>
             {MY_DOG.tagId && (
-              <p className="text-sm text-blue mt-2">
-                🏷️ Tag: {MY_DOG.tagId} · Battery: 94%
-              </p>
+              <div className="flex items-center gap-1.5 mt-2">
+                <span className="w-2 h-2 rounded-full bg-success shrink-0" />
+                <p className="text-sm text-grey">
+                  Tag: {MY_DOG.tagId} · Battery: 94%
+                </p>
+              </div>
             )}
             <Button
               variant="outline"
@@ -278,7 +283,7 @@ export default function SettingsScreen() {
             </button>
             <button
               type="button"
-              className="w-full p-4 min-h-[44px] text-left font-medium text-error"
+              className="w-full p-4 min-h-[44px] text-left text-error/70 text-sm"
               onClick={() => setDeleteDialogOpen(true)}
             >
               Delete Account

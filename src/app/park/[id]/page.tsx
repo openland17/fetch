@@ -16,6 +16,7 @@ import { getParkById } from "@/data/parks";
 import { useApp } from "@/hooks/useAppState";
 import DogAtParkCard from "@/components/DogAtParkCard";
 import Button from "@/components/ui/Button";
+import Toast from "@/components/ui/Toast";
 import { formatDurationFromSeconds } from "@/lib/dateHelpers";
 
 export default function ParkDetailPage() {
@@ -26,6 +27,12 @@ export default function ParkDetailPage() {
   const park = getParkById(parkId);
 
   const [showEndSheet, setShowEndSheet] = useState(false);
+  const [toast, setToast] = useState<{ msg: string; visible: boolean }>({ msg: "", visible: false });
+
+  const showToast = (msg: string) => {
+    setToast({ msg, visible: true });
+    setTimeout(() => setToast((p) => ({ ...p, visible: false })), 2500);
+  };
 
   const friendIds = useMemo(
     () => new Set(state.friendships.map((f) => f.dog.id)),
@@ -86,11 +93,12 @@ export default function ParkDetailPage() {
   const handleEndVisit = () => {
     setShowEndSheet(false);
     endVisit();
-    router.push("/visits");
+    showToast("Visit saved!");
   };
 
   return (
     <>
+      <Toast message={toast.msg} variant="success" visible={toast.visible} />
       <motion.div
         className="flex flex-col min-h-full"
         initial={{ opacity: 0, x: 24 }}
@@ -105,11 +113,12 @@ export default function ParkDetailPage() {
             <motion.button
               type="button"
               onClick={() => router.back()}
-              className="min-w-[44px] min-h-[44px] flex items-center justify-center -ml-1 rounded-lg active:bg-white/10 shrink-0"
+              className="min-h-[44px] flex items-center gap-0.5 -ml-1 rounded-lg active:bg-white/10 shrink-0 pr-1"
               whileTap={{ scale: 0.92 }}
               aria-label="Go back"
             >
-              <ChevronLeft size={24} strokeWidth={2.5} />
+              <ChevronLeft size={20} strokeWidth={2.5} />
+              <span className="text-sm font-medium">Parks</span>
             </motion.button>
             <div className="min-w-0">
               <h1 className="text-lg font-bold truncate">{park.name}</h1>
@@ -123,11 +132,20 @@ export default function ParkDetailPage() {
           </div>
 
           {liveFriendCount > 0 && (
-            <div className="mt-3 rounded-lg bg-lightorange border border-orange/50 px-3 py-2">
-              <p className="text-sm font-semibold text-charcoal">
-                ⭐ {liveFriendCount} of Cooper&apos;s friend
-                {liveFriendCount !== 1 ? "s are" : " is"} here!
+            <div className="mt-3 rounded-xl bg-gradient-to-r from-orange/15 to-orange/5 border border-orange/30 px-4 py-3">
+              <p className="text-sm font-semibold text-white">
+                ⭐ {liveFriendCount} of Cooper&apos;s friend{liveFriendCount !== 1 ? "s are" : " is"} here!
               </p>
+            </div>
+          )}
+
+          {isCheckedInHere && (
+            <div className="mt-3 rounded-xl bg-success/15 border border-success/30 px-4 py-2.5 flex items-center gap-2">
+              <span className="relative flex h-2.5 w-2.5 shrink-0">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-success opacity-75" />
+                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-success" />
+              </span>
+              <p className="text-sm font-medium text-white">You&apos;re here! ✓</p>
             </div>
           )}
 
@@ -223,13 +241,22 @@ export default function ParkDetailPage() {
               </Button>
             </div>
           ) : isCheckedInElsewhere ? (
-            <div className="text-center">
-              <p className="text-xs text-grey mb-2">
-                End your visit at {activeVisit?.parkName} first
+            <div className="space-y-2">
+              <p className="text-xs text-grey text-center">
+                You&apos;re checked in at {activeVisit?.parkName}
               </p>
-              <Button variant="secondary" size="md" fullWidth disabled>
-                <LogIn size={16} strokeWidth={2.5} />
-                Check In
+              <Button
+                variant="danger"
+                size="md"
+                fullWidth
+                onClick={() => {
+                  endVisit();
+                  showToast("Visit saved!");
+                  setTimeout(() => checkIn(parkId), 100);
+                }}
+              >
+                <LogOut size={16} strokeWidth={2.5} />
+                End Visit &amp; Check In Here
               </Button>
             </div>
           ) : (

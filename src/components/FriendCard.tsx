@@ -23,39 +23,41 @@ export default function FriendCard({ friend, priority = false }: FriendCardProps
   const lastSeenText =
     lastSeenAt.startsWith("At ") ? lastSeenAt.slice(3) : lastSeenAt;
   const { openDogProfile } = useDogProfile();
+  const milestone = getMilestone(totalEncounters, totalMinutesTogether);
 
   return (
     <motion.div
-      className="bg-white rounded-xl shadow-sm p-4 flex items-center gap-4 cursor-pointer"
-      whileTap={{ scale: 0.98 }}
+      className="bg-white rounded-xl shadow-sm border border-grey/10 p-4 flex items-center gap-4 cursor-pointer"
+      whileTap={{ scale: 0.97 }}
       role="button"
       tabIndex={0}
       onClick={() => openDogProfile(dog.id)}
     >
-      <Avatar
-        src={dog.photoUrl}
-        alt={dog.name}
-        size="md"
-        bordered
-        priority={priority}
-      />
+      <div className="rounded-full ring-2 ring-offset-2 ring-orange shrink-0">
+        <Avatar
+          src={dog.photoUrl}
+          alt={dog.name}
+          size="md"
+          bordered={false}
+          priority={priority}
+        />
+      </div>
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-1.5">
-          <p className="font-bold text-[15px] text-charcoal truncate">{dog.name}</p>
-          <span className="text-xs shrink-0" title={getMilestone(totalEncounters, totalMinutesTogether).label}>
-            {getMilestone(totalEncounters, totalMinutesTogether).emoji}
+          <p className="font-semibold text-[15px] text-charcoal truncate">{dog.name}</p>
+          <span className="inline-flex items-center bg-offwhite text-[10px] font-semibold rounded-full px-1.5 py-0.5 shrink-0" title={milestone.label}>
+            {milestone.emoji} {milestone.label}
           </span>
         </div>
         <p className="text-xs text-grey mt-0.5">{dog.breed}</p>
         <p className="text-xs text-grey mt-1">
-          🕐 {formatHours(totalMinutesTogether)} together · 📍 {totalEncounters}{" "}
-          visit{totalEncounters !== 1 ? "s" : ""}
+          🕐 {formatHours(totalMinutesTogether)} · 📍 {totalEncounters} visit{totalEncounters !== 1 ? "s" : ""}
         </p>
-        <p className="text-xs text-blue mt-0.5">
+        <p className="text-xs text-blue mt-0.5 font-medium">
           Last seen: {lastSeenText}
         </p>
       </div>
-      <ChevronRight size={20} className="text-grey shrink-0" strokeWidth={2} />
+      <ChevronRight size={18} className="text-grey/40 shrink-0" strokeWidth={2} />
     </motion.div>
   );
 }

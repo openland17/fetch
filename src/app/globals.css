@@ -69,8 +69,7 @@ textarea {
 
 @layer components {
   .section-label {
-    @apply text-xs uppercase tracking-wider text-grey font-semibold mb-3;
-    letter-spacing: 0.05em;
+    @apply text-[11px] uppercase tracking-widest text-grey/60 font-medium mb-3;
   }
 }
 
